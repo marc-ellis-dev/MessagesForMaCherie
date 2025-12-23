@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ma Chérie 💖</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="icon-192.png">
+  <link rel="shortcut icon" href="icon-192.png" type="image/png">
+
+  <!-- PWA links -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff7eb9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="LoveMsg">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    /* Page */
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #ffd6e8, #ffc0d9);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    /* Floating hearts */
+    .hearts {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .heart {
+      position: absolute;
+      bottom: -20px;
+      animation: floatUp linear infinite;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    @keyframes floatUp {
+      from { transform: translateY(0); opacity: 0.85; }
+      to { transform: translateY(-110vh); opacity: 0; }
+    }
+
+    /* Container */
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      max-width: 90vw;
+      padding: 1.5rem;
+      gap: 1rem;
+    }
+
+    /* Text shadows for visibility */
+    .date, .message, .signature {
+      text-shadow:
+        -2px -2px 0 #000,
+         0px -2px 0 #000,
+         2px -2px 0 #000,
+        -2px  0px 0 #000,
+         2px  0px 0 #000,
+        -2px  2px 0 #000,
+         0px  2px 0 #000,
+         2px  2px 0 #000,
+         0px  4px 8px rgba(0,0,0,0.35);
+      opacity: 0.95;
+    }
+
+    .date { font-size: 1rem; }
+    .message { font-size: clamp(1.6rem, 5vw, 2.6rem); margin: auto 0; }
+    .signature { font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+
+  <div class="hearts" id="hearts"></div>
+
+  <div class="container">
+    <div class="date" id="date"></div>
+    <div class="message" id="message"></div>
+    <div class="signature">Yours, Marc</div>
+  </div>
+
+  <script>
+    /* Messages */
+    const messages = [
+      "You’re my favorite person ❤️",
+      "Thinking of you today 💕",
+      "You make everything better 💖",
+      "I’m so lucky to have you 💫"
+    ];
+
+    /* Today's date */
+    const today = new Date();
+    document.getElementById("date").textContent =
+      today.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric" });
+
+    /* Day-of-year cycling */
+    function getDayOfYear(date) {
+      const start = new Date(date.getFullYear(),0,0);
+      const diff = date - start;
+      return Math.floor(diff / (1000*60*60*24));
+    }
+    const dayOfYear = getDayOfYear(today);
+    const messageIndex = dayOfYear % messages.length;
+    const messageText = messages[messageIndex];
+
+    /* Typewriter */
+    const messageEl = document.getElementById("message");
+    let i = 0;
+    function typeWriter() {
+      if (i < messageText.length) {
+        messageEl.textContent += messageText.charAt(i);
+        i++;
+        setTimeout(typeWriter, 60);
+      }
+    }
+    typeWriter();
+
+    /* Floating hearts */
+    const heartsContainer = document.getElementById("hearts");
+    const heartEmojis = ["❤️","💖","💕","💗"];
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+      heart.style.left = Math.random()*100+"vw";
+      heart.style.fontSize = (14+Math.random()*26)+"px";
+      heart.style.animationDuration = (5+Math.random()*6)+"s";
+      heartsContainer.appendChild(heart);
+      setTimeout(()=>heart.remove(),11000);
+    }
+    setInterval(createHeart, 350);
+
+    /* Service Worker registration */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.error('SW registration failed:', err));
+    }
+  </script>
+
+</body>
+</html>
