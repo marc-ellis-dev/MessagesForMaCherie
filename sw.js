@@ -1,4 +1,6 @@
-const CACHE_NAME = "ma-cherie-v1";
+const CACHE_VERSION = "v2";
+const CACHE_NAME = `ma-cherie-${CACHE_VERSION}`;
+
 const urlsToCache = [
   "/",
   "/index.html",
@@ -10,6 +12,17 @@ const urlsToCache = [
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+  );
+});
+
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME)
+            .map(key => caches.delete(key))
+      )
+    )
   );
 });
 
