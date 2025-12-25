@@ -192,6 +192,11 @@
       "I love how you inspire me every single day 💗"
     ];
 
+    const specialMessages = {
+      "01-01": "Happy New Year, my sweetheart! May your year be full of good times and great company 💖",
+      "12-25": "Merry Christmas, ma bell chérie! Every day is a gift when I'm connected to you 💕"
+    };
+
     const today = new Date();
     document.getElementById("date").textContent =
       today.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric" });
@@ -207,10 +212,19 @@
       return x - Math.floor(x);
     }
 
-    const dayOfYear = getDayOfYear(today);
-    const seed = today.getFullYear() * 1000 + dayOfYear;
-    const messageIndex = Math.floor(seededRandom(seed) * messages.length);
-    const messageText = messages[messageIndex];
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const todayKey = `${month}-${day}`;
+
+    let messageText;
+    if (specialMessages[todayKey]) {
+      messageText = specialMessages[todayKey];
+    } else {
+      const dayOfYear = getDayOfYear(today);
+      const seed = today.getFullYear() * 1000 + dayOfYear;
+      const messageIndex = Math.floor(seededRandom(seed) * messages.length);
+      messageText = messages[messageIndex];
+    }
 
     const messageEl = document.getElementById("message");
     let i = 0;
