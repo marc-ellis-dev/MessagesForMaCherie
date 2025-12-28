@@ -33,27 +33,15 @@
     }
     .heart {
       position: absolute;
+      bottom: -20px;
+      animation: floatUp linear infinite;
       pointer-events: none;
-      animation:
-        floatUp linear infinite,
-        sway ease-in-out infinite,
-        pulse 3s ease-in-out infinite;
-      filter: drop-shadow(0 0 8px rgba(255,120,180,0.6));
+      opacity: 0.85;
+      filter: drop-shadow(0 0 6px rgba(255,126,185,0.6));
     }
-
     @keyframes floatUp {
-      from { transform: translateY(0); }
-      to { transform: translateY(-120vh); }
-    }
-
-    @keyframes sway {
-      0%, 100% { margin-left: 0; }
-      50% { margin-left: 20px; }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
+      from { transform: translateY(0); opacity: 0.85; }
+      to { transform: translateY(-110vh); opacity: 0; }
     }
     .container {
       position: relative;
@@ -260,51 +248,18 @@
     typeWriter();
 
     const heartsContainer = document.getElementById("hearts");
-    function createSVGHeart() {
-      const wrapper = document.createElement("div");
-      wrapper.className = "heart";
-
-      const size = 14 + Math.random() * 28;
-      const hue = 330 + Math.random() * 20; // pink range
-
-      wrapper.innerHTML = `
-        <svg width="${size}" height="${size}" viewBox="0 0 32 29">
-          <defs>
-            <linearGradient id="grad">
-              <stop offset="0%" stop-color="hsl(${hue}, 100%, 85%)"/>
-              <stop offset="100%" stop-color="hsl(${hue}, 90%, 65%)"/>
-            </linearGradient>
-          </defs>
-          <path
-            d="M23.6,0
-              c-3.4,0-6.4,2.1-7.6,5.1
-              C14.8,2.1,11.8,0,8.4,0
-              C3.8,0,0,3.8,0,8.4
-              c0,9.4,16,20.6,16,20.6
-              s16-11.2,16-20.6
-              C32,3.8,28.2,0,23.6,0z"
-            fill="url(#grad)"
-          />
-        </svg>
-      `;
-
-      return wrapper;
-    }
-
+    const heartEmojis = ["❤️","💖","💕","💗","💘","💝"];
     function createHeart() {
-      const heart = createSVGHeart();
-
-      heart.style.left = Math.random() * 100 + "vw";
-      heart.style.bottom = "-40px";
-      heart.style.opacity = 0.7 + Math.random() * 0.3;
-      heart.style.animationDuration = (6 + Math.random() * 6) + "s";
-      heart.style.transform = `rotate(${Math.random()*40 - 20}deg)`;
-
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+      heart.style.left = Math.random()*100+"vw";
+      heart.style.fontSize = (14+Math.random()*26)+"px";
+      heart.style.animationDuration = (5+Math.random()*6)+"s";
       heartsContainer.appendChild(heart);
-      setTimeout(() => heart.remove(), 12000);
+      setTimeout(()=>heart.remove(),11000);
     }
-
-    setInterval(createHeart, 420);
+    setInterval(createHeart, 350);
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
