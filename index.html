@@ -18,7 +18,14 @@
     body {
       margin: 0;
       height: 100vh;
-      background: linear-gradient(135deg, #ffd6e8, #ffc0d9);
+      background: linear-gradient(
+        270deg,
+        #ffd6e8,
+        #ffc0d9,
+        #ffb3d1
+      );
+      background-size: 600% 600%;
+      animation: gradientShift 20s ease infinite;
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -43,6 +50,11 @@
       from { transform: translateY(0); opacity: 0.85; }
       to { transform: translateY(-110vh); opacity: 0; }
     }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     .container {
       position: relative;
       z-index: 2;
@@ -61,6 +73,11 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.25);
       padding: 2rem 2.5rem;
       border: 1px solid rgba(255,255,255,0.35);
+    }
+    .special-day .container {
+      box-shadow:
+        0 0 25px rgba(222, 45, 124, 0.6),
+        0 20px 40px rgba(0,0,0,0.3);
     }
     .date, .message, .signature {
       text-shadow:
@@ -229,6 +246,7 @@
     let messageText;
     if (specialMessages[todayKey]) {
       messageText = specialMessages[todayKey];
+      document.body.classList.add("special-day");
     } else {
       const dayOfYear = getDayOfYear(today);
       const seed = today.getFullYear() * 1000 + dayOfYear;
