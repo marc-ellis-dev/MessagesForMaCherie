@@ -17,7 +17,8 @@
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
+      min-height: 100dvh;
       background: linear-gradient(
         270deg,
         #ffd6e8,
@@ -31,6 +32,8 @@
       align-items: center;
       justify-content: center;
       font-family: "Segoe UI", sans-serif;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
     body.night {
       background: linear-gradient(
