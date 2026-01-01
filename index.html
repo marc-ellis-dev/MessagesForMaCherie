@@ -114,11 +114,11 @@
       font-size: clamp(1.6rem, 5vw, 2.6rem); 
       margin: auto 0; 
     }
-    .message.sparkle {
+    .container.sparkle {
       position: relative;
       overflow: hidden;
     }
-    .message.sparkle::after {
+    .container.sparkle::after {
       content: "";
       position: absolute;
       inset: 0;
@@ -151,7 +151,7 @@
 </head>
 <body>
   <div class="hearts" id="hearts"></div>
-  <div class="container">
+  <div class="container" id="container">
     <div class="date" id="date"></div>
     <div class="message" id="message"></div>
     <div class="signature">Yours, Marc</div>
@@ -312,6 +312,7 @@
     }
 
     const messageEl = document.getElementById("message");
+    const container = document.getElementById("container");
     let i = 0;
     function typeWriter() {
       if (i < messageText.length) {
@@ -319,7 +320,7 @@
         i++;
         setTimeout(typeWriter, 60);
       } else {
-        messageEl.classList.add("sparkle");
+        container.classList.add("sparkle");
       }
     }
     typeWriter();
