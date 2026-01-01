@@ -32,6 +32,22 @@
       justify-content: center;
       font-family: "Segoe UI", sans-serif;
     }
+    body.night {
+      background: linear-gradient(
+        270deg,
+        #2b1a2f,
+        #3a1f3f,
+        #4a2450
+      );
+    }
+    body.night .container {
+      background: rgba(30, 20, 35, 0.55);
+      border-color: rgba(255,255,255,0.15);
+    }
+    body.night .heart {
+      opacity: 0.6;
+      filter: drop-shadow(0 0 4px rgba(255,180,220,0.4));
+    }
     .hearts {
       position: absolute;
       inset: 0;
@@ -39,21 +55,17 @@
       overflow: hidden;
     }
     .heart {
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
       position: absolute;
       bottom: -20px;
       animation: floatUp linear infinite;
-      pointer-events: none;
       opacity: 0.85;
       filter: drop-shadow(0 0 6px rgba(255,126,185,0.6));
     }
-    @keyframes floatUp {
-      from { transform: translateY(0); opacity: 0.85; }
-      to { transform: translateY(-110vh); opacity: 0; }
-    }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .heart.pop {
+      transform: scale(1.8);
+      opacity: 0;
     }
     .container {
       position: relative;
@@ -92,9 +104,46 @@
          0px  4px 8px rgba(0,0,0,0.35);
       opacity: 0.95;
     }
-    .date { font-size: 1rem; }
-    .message { font-size: clamp(1.6rem, 5vw, 2.6rem); margin: auto 0; }
-    .signature { font-size: 1.1rem; }
+    .date { 
+      font-size: 1rem; 
+    }
+    .message { 
+      font-size: clamp(1.6rem, 5vw, 2.6rem); 
+      margin: auto 0; 
+    }
+    .message.sparkle {
+      position: relative;
+      overflow: hidden;
+    }
+    .message.sparkle::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        120deg,
+        transparent 30%,
+        rgba(255,255,255,0.6) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%);
+      animation: shimmer 2.5s ease-in-out 1;
+      pointer-events: none;
+    }
+    .signature { 
+      font-size: 1.1rem; 
+    }
+    @keyframes floatUp {
+      from { transform: translateY(0); opacity: 0.85; }
+      to { transform: translateY(-110vh); opacity: 0; }
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes shimmer {
+      to { transform: translateX(100%); }
+    }
   </style>
 </head>
 <body>
@@ -228,6 +277,11 @@
     document.getElementById("date").textContent =
       today.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric" });
 
+    const hour = today.getHours();
+    if (hour >= 20 || hour < 6) {
+      document.body.classList.add("night");
+    }
+
     function getDayOfYear(date) {
       const start = new Date(date.getFullYear(),0,0);
       const diff = date - start;
@@ -261,6 +315,8 @@
         messageEl.textContent += messageText.charAt(i);
         i++;
         setTimeout(typeWriter, 60);
+      } else {
+        messageEl.classList.add("sparkle");
       }
     }
     typeWriter();
@@ -274,6 +330,13 @@
       heart.style.left = Math.random()*100+"vw";
       heart.style.fontSize = (14+Math.random()*26)+"px";
       heart.style.animationDuration = (5+Math.random()*6)+"s";
+
+      heart.addEventListener("click", () => {
+        heart.classList.add("pop");
+        if (navigator.vibrate) navigator.vibrate(10);
+        setTimeout(() => heart.remove(), 200);
+      });
+
       heartsContainer.appendChild(heart);
       setTimeout(()=>heart.remove(),11000);
     }
