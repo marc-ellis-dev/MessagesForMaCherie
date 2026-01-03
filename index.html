@@ -51,6 +51,35 @@
       opacity: 0.6;
       filter: drop-shadow(0 0 4px rgba(255,180,220,0.4));
     }
+    body.valentines {
+      background: radial-gradient(circle at top,
+        #ff9acb,
+        #ff4f9a,
+        #b1005a
+      );
+    }
+    body.valentines .container {
+      background: rgba(255, 230, 240, 0.2);
+      box-shadow:
+        0 0 40px rgba(255, 80, 160, 0.8),
+        0 30px 60px rgba(0,0,0,0.35);
+    }
+    body.valentines .heart {
+      filter: drop-shadow(0 0 8px rgba(255,0,80,0.6));
+      text-shadow:
+        -2px -2px 0 #000,
+         0px -2px 0 #000,
+         2px -2px 0 #000,
+        -2px  0px 0 #000,
+         2px  0px 0 #000,
+        -2px  2px 0 #000,
+         0px  2px 0 #000,
+         2px  2px 0 #000,
+         0px  4px 8px rgba(0,0,0,0.35);
+    }
+    body.valentines .message {
+      animation: heartbeat 2s infinite;
+    }
     .hearts {
       position: absolute;
       inset: 0;
@@ -146,6 +175,10 @@
     }
     @keyframes shimmer {
       to { transform: translateX(100%); }
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
     }
   </style>
 </head>
@@ -273,16 +306,23 @@
       "12-25": "Merry Christmas, ma belle chérie! Every day is a gift when I'm connected to you 💕",
       "12-29": "So excited to be going away with you! Prepare to be adored ❤️",
       "12-30": "Day 2 of our stay and I'm the happiest man on Earth because I'm with you 😊",
-      "12-31": "I hope you've enjoyed our stay, I wish it could last forever 🥰"
+      "12-31": "I hope you've enjoyed our stay, I wish it could last forever 🥰",
+      "02-14": "Happy Valentine's Day sweetie! Today's message is extra special and needs to be delivered in person 🌺"
     };
 
     const today = new Date();
     document.getElementById("date").textContent =
       today.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric" });
 
-    const hour = today.getHours();
-    if (hour >= 20 || hour < 6) {
-      document.body.classList.add("night");
+    const isValentines = today.getMonth() === 1 && today.getDate() === 14;
+
+    if (isValentines) {
+      document.body.classList.add("valentines");
+    } else {
+      const hour = today.getHours();
+      if (hour >= 20 || hour < 6) {
+        document.body.classList.add("night");
+      }
     }
 
     function getDayOfYear(date) {
@@ -303,7 +343,12 @@
     let messageText;
     if (specialMessages[todayKey]) {
       messageText = specialMessages[todayKey];
-      document.body.classList.add("special-day");
+      if (!isValentines) {
+        document.body.classList.add("special-day");
+      } else {
+        document.querySelector(".signature").innerHTML =
+          "Forever yours, Marc ❤️";
+      }
     } else {
       const dayOfYear = getDayOfYear(today);
       const seed = today.getFullYear() * 1000 + dayOfYear;
@@ -326,7 +371,9 @@
     typeWriter();
 
     const heartsContainer = document.getElementById("hearts");
-    const heartEmojis = ["❤️","💖","💕","💗","💘","💝"];
+    const heartEmojis = isValentines
+      ? ["🌹","💐","🌸","❤️","💖","💕","💗","💘","💝"]
+      : ["❤️","💖","💕","💗","💘","💝"];
     function createHeart() {
       const heart = document.createElement("div");
       heart.className = "heart";
