@@ -164,6 +164,12 @@
     .signature { 
       font-size: 1.1rem; 
     }
+    .sparkle-word {
+      position: relative;
+      display: inline-block;
+      color: #fff;
+      animation: sparkleGlow 2.5s ease-in-out infinite;
+    }
     @keyframes floatUp {
       from { transform: translateY(0); opacity: 0.85; }
       to { transform: translateY(-110vh); opacity: 0; }
@@ -179,6 +185,18 @@
     @keyframes heartbeat {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.02); }
+    }
+    @keyframes sparkleGlow {
+      0%, 100% {
+        text-shadow:
+          0 0 4px rgba(255,255,255,0.4),
+          0 0 8px rgba(255,200,230,0.4);
+      }
+      50% {
+        text-shadow:
+          0 0 6px rgba(255,255,255,0.8),
+          0 0 14px rgba(255,200,230,0.9);
+      }
     }
   </style>
 </head>
@@ -310,6 +328,10 @@
       "02-14": "Happy Valentine's Day sweetie! Today's message needs to be delivered in person ❤️🌺"
     };
 
+    const animatedWords = {
+      sparkle: "sparkle-word"
+    };
+
     const today = new Date();
     document.getElementById("date").textContent =
       today.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric" });
@@ -340,6 +362,19 @@
     const day = String(today.getDate()).padStart(2, "0");
     const todayKey = `${month}-${day}`;
 
+    function applyWordAnimations(text) {
+      let result = text;
+      for (const word in animatedWords) {
+        const className = animatedWords[word];
+        const regex = new RegExp(`\\b(${word})\\b`, "gi");
+        result = result.replace(
+          regex,
+          `<span class="${className}">$1</span>`
+        );
+      }
+      return result;
+    }
+
     let messageText;
     if (specialMessages[todayKey]) {
       messageText = specialMessages[todayKey];
@@ -358,16 +393,54 @@
 
     const messageEl = document.getElementById("message");
     const container = document.getElementById("container");
-    let i = 0;
+    const animatedHTML = applyWordAnimations(messageText);
+    const tokens = animatedHTML.match(/(<[^>]+>|[^<]+)/g);
+
+    let tokenIndex = 0;
+    let charIndex = 0;
+    const nodeStack = [messageEl];
+
     function typeWriter() {
-      if (i < messageText.length) {
-        messageEl.textContent += messageText.charAt(i);
-        i++;
-        setTimeout(typeWriter, 60);
-      } else {
+      if (tokenIndex >= tokens.length) {
         container.classList.add("sparkle");
+        return;
+      }
+
+      const token = tokens[tokenIndex];
+      const currentNode = nodeStack[nodeStack.length - 1];
+
+      if (/^<span\b/.test(token)) {
+        const span = document.createElement("span");
+        const classMatch = token.match(/class="([^"]+)"/);
+        if (classMatch) span.className = classMatch[1];
+
+        currentNode.appendChild(span);
+        nodeStack.push(span);
+        tokenIndex++;
+        setTimeout(typeWriter, 0);
+        return;
+      }
+
+      if (token === "</span>") {
+        nodeStack.pop();
+        tokenIndex++;
+        setTimeout(typeWriter, 0);
+        return;
+      }
+
+      if (charIndex < token.length) {
+        currentNode.appendChild(
+          document.createTextNode(token.charAt(charIndex))
+        );
+        charIndex++;
+        setTimeout(typeWriter, 50);
+      } else {
+        charIndex = 0;
+        tokenIndex++;
+        setTimeout(typeWriter, 0);
       }
     }
+
     typeWriter();
 
     const heartsContainer = document.getElementById("hearts");
